@@ -1,0 +1,22 @@
+{% extends "portal_base.html" %}{% load humanize %}
+{% block title %}All Invoices - CapitalZW Admin{% endblock %}{% block page_title %}Platform Invoices{% endblock %}
+{% block content %}
+<div class="mb-4 flex gap-3">
+    <form method="get" class="flex gap-2 flex-1">
+        <select name="status" class="px-3 py-2 border rounded-lg text-sm flex-1"><option value="">All Statuses</option><option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option><option value="pending_buyer_approval" {% if status_filter == 'pending_buyer_approval' %}selected{% endif %}>Pending Approval</option><option value="available_for_financing" {% if status_filter == 'available_for_financing' %}selected{% endif %}>Available</option><option value="offer_received" {% if status_filter == 'offer_received' %}selected{% endif %}>Offer Received</option><option value="offer_accepted" {% if status_filter == 'offer_accepted' %}selected{% endif %}>Offer Accepted</option><option value="settlement_pending" {% if status_filter == 'settlement_pending' %}selected{% endif %}>Settlement Pending</option><option value="settled" {% if status_filter == 'settled' %}selected{% endif %}>Settled</option><option value="repaid" {% if status_filter == 'repaid' %}selected{% endif %}>Repaid</option></select>
+        <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm">Filter</button>
+    </form>
+</div>
+<div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50"><tr><th class="px-5 py-3 text-left font-medium">Reference</th><th class="px-5 py-3 text-left font-medium">Supplier</th><th class="px-5 py-3 text-left font-medium">Buyer</th><th class="px-5 py-3 text-right font-medium">Amount</th><th class="px-5 py-3 text-left font-medium">Status</th><th class="px-5 py-3"></th></tr></thead>
+        <tbody class="divide-y">
+        {% for inv in invoices %}
+        <tr class="hover:bg-gray-50"><td class="px-5 py-3 font-medium">{{ inv.invoice_reference }}</td><td class="px-5 py-3">{{ inv.supplier.name }}</td><td class="px-5 py-3">{{ inv.buyer.name }}</td><td class="px-5 py-3 text-right">{{ inv.currency }} {{ inv.invoice_amount|intcomma }}</td><td class="px-5 py-3"><span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span></td><td class="px-5 py-3"><a href="{% url 'invoices:detail' inv.id %}" class="text-emerald-600">View</a></td></tr>
+        {% empty %}
+        <tr><td colspan="6" class="px-5 py-12 text-center text-gray-400">No invoices on the platform.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

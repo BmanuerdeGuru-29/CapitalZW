@@ -1,0 +1,16 @@
+{% extends "portal_base.html" %}{% load humanize %}
+{% block title %}Buyer Invoices - CapitalZW{% endblock %}{% block page_title %}All Invoices{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50"><tr><th class="px-5 py-3 text-left font-medium">Reference</th><th class="px-5 py-3 text-left font-medium">Supplier</th><th class="px-5 py-3 text-right font-medium">Amount</th><th class="px-5 py-3 text-left font-medium">Status</th><th class="px-5 py-3"></th></tr></thead>
+        <tbody class="divide-y">
+        {% for inv in invoices %}
+        <tr class="hover:bg-gray-50"><td class="px-5 py-3 font-medium">{{ inv.invoice_reference }}</td><td class="px-5 py-3">{{ inv.supplier.name }}</td><td class="px-5 py-3 text-right">{{ inv.currency }} {{ inv.invoice_amount|intcomma }}</td><td class="px-5 py-3"><span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span></td><td class="px-5 py-3"><a href="{% url 'invoices:detail' inv.id %}" class="text-emerald-600">View</a></td></tr>
+        {% empty %}
+        <tr><td colspan="5" class="px-5 py-12 text-center text-gray-400">No invoices found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

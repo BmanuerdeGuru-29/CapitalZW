@@ -1,0 +1,35 @@
+{% extends "portal_base.html" %}{% load humanize %}
+{% block title %}Submit Invoice - CapitalZW{% endblock %}{% block page_title %}Submit Invoice{% endblock %}
+{% block content %}
+<div class="max-w-3xl">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            <div><h3 class="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b">Invoice Details</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Buyer *</label>{{ form.buyer }}{% if form.buyer.errors %}<p class="text-red-500 text-xs mt-1">{{ form.buyer.errors.0 }}</p>{% endif %}</div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Invoice Number *</label>{{ form.invoice_number }}{% if form.invoice_number.errors %}<p class="text-red-500 text-xs mt-1">{{ form.invoice_number.errors.0 }}</p>{% endif %}</div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">PO Number</label>{{ form.purchase_order_number }}</div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">GRN Number</label>{{ form.grn_number }}</div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Currency *</label>{{ form.currency }}</div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Amount *</label>{{ form.invoice_amount }}{% if form.invoice_amount.errors %}<p class="text-red-500 text-xs mt-1">{{ form.invoice_amount.errors.0 }}</p>{% endif %}</div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Invoice Date *</label>{{ form.invoice_date }}{% if form.invoice_date.errors %}<p class="text-red-500 text-xs mt-1">{{ form.invoice_date.errors.0 }}</p>{% endif %}</div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Due Date *</label>{{ form.due_date }}{% if form.due_date.errors %}<p class="text-red-500 text-xs mt-1">{{ form.due_date.errors.0 }}</p>{% endif %}</div>
+                    <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">Description</label>{{ form.description }}</div>
+                </div>
+            </div>
+            <div><h3 class="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b">Document Upload</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Document Type</label>{{ doc_form.document_type }}</div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">File (PDF, JPG, PNG, DOCX, XLSX)</label>{{ doc_form.file }}</div>
+                </div>
+                <p class="text-xs text-gray-400 mt-2">Max file size: 10MB. At least one document required before submission.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" name="action" value="draft" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition-colors">Save Draft</button>
+                <button type="submit" name="action" value="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">Submit Invoice</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

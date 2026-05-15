@@ -1,0 +1,20 @@
+{% extends "portal_base.html" %}
+{% block title %}Organisations - CapitalZW{% endblock %}{% block page_title %}Organisation Management{% endblock %}
+{% block content %}
+<div class="mb-4"><form method="get" class="flex gap-2">
+    <input type="text" name="q" value="{{ search }}" placeholder="Search..." class="px-4 py-2 border rounded-lg text-sm flex-1">
+    <select name="type" class="px-3 py-2 border rounded-lg text-sm"><option value="">All Types</option><option value="supplier" {% if type_filter == 'supplier' %}selected{% endif %}>Supplier</option><option value="buyer" {% if type_filter == 'buyer' %}selected{% endif %}>Buyer</option><option value="financier" {% if type_filter == 'financier' %}selected{% endif %}>Financier</option></select>
+    <select name="status" class="px-3 py-2 border rounded-lg text-sm"><option value="">All Status</option><option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option><option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option><option value="suspended" {% if status_filter == 'suspended' %}selected{% endif %}>Suspended</option></select>
+    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm">Filter</button>
+</form></div>
+<div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50"><tr><th class="px-5 py-3 text-left font-medium">Name</th><th class="px-5 py-3 text-left font-medium">Type</th><th class="px-5 py-3 text-left font-medium">City</th><th class="px-5 py-3 text-left font-medium">Status</th><th class="px-5 py-3"></th></tr></thead>
+        <tbody class="divide-y">
+        {% for org in organisations %}
+        <tr class="hover:bg-gray-50"><td class="px-5 py-3 font-medium">{{ org.name }}</td><td class="px-5 py-3">{{ org.get_organisation_type_display }}</td><td class="px-5 py-3">{{ org.city }}</td><td class="px-5 py-3"><span class="status-badge status-{{ org.status }}">{{ org.get_status_display }}</span></td><td class="px-5 py-3"><a href="{% url 'organisations:detail' org.id %}" class="text-emerald-600">View</a></td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

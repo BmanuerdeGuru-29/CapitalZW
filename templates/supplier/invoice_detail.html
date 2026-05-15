@@ -1,0 +1,81 @@
+{% extends "portal_base.html" %}{% load humanize %}
+{% block title %}{{ invoice.invoice_reference }} - CapitalZW{% endblock %}{% block page_title %}Invoice {{ invoice.invoice_reference }}{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-semibold">Invoice Details</h3>
+                <span class="status-badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span>
+            </div>
+            <dl class="grid grid-cols-2 gap-4 text-sm">
+                <div><dt class="text-gray-500">Reference</dt><dd class="font-medium">{{ invoice.invoice_reference }}</dd></div>
+                <div><dt class="text-gray-500">Invoice Number</dt><dd class="font-medium">{{ invoice.invoice_number }}</dd></div>
+                <div><dt class="text-gray-500">Supplier</dt><dd class="font-medium">{{ invoice.supplier.name }}</dd></div>
+                <div><dt class="text-gray-500">Buyer</dt><dd class="font-medium">{{ invoice.buyer.name }}</dd></div>
+                <div><dt class="text-gray-500">Amount</dt><dd class="font-medium text-lg">{{ invoice.currency }} {{ invoice.invoice_amount|intcomma }}</dd></div>
+                <div><dt class="text-gray-500">Due Date</dt><dd class="font-medium {% if invoice.is_overdue %}text-red-600{% endif %}">{{ invoice.due_date }}{% if invoice.days_until_due is not None %} <span class="text-xs text-gray-400">({{ invoice.days_until_due }} days)</span>{% endif %}</dd></div>
+                <div><dt class="text-gray-500">Invoice Date</dt><dd class="font-medium">{{ invoice.invoice_date }}</dd></div>
+                {% if invoice.purchase_order_number %}<div><dt class="text-gray-500">PO Number</dt><dd class="font-medium">{{ invoice.purchase_order_number }}</dd></div>{% endif %}
+                {% if invoice.description %}<div class="col-span-2"><dt class="text-gray-500">Description</dt><dd class="font-medium">{{ invoice.description }}</dd></div>{% endif %}
+            </dl>
+        </div>
+        <!-- Documents -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-4">Documents</h3>
+            {% for doc in documents %}
+            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                <div><p class="text-sm font-medium">{{ doc.file_name }}</p><p class="text-xs text-gray-500">{{ doc.get_document_type_display }} · {{ doc.file_size|filesizeformat }}</p></div>
+                <a href="{% url 'invoices:doc_download' doc.id %}" class="text-sm text-emerald-600 hover:text-emerald-700">Download</a>
+            </div>
+            {% empty %}
+            <p class="text-gray-400 text-sm">No documents uploaded.</p>
+            {% endfor %}
+            {% if request.user.is_supplier and request.user.organisation == invoice.supplier and invoice.status in 'draft,clarification_requested' %}
+            <form method="post" action="{% url 'invoices:upload_doc' invoice.id %}" enctype="multipart/form-data" class="mt-4 flex gap-2 items-end">
+                {% csrf_token %}
+                <select name="document_type" class="px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="invoice">Invoice</option><option value="po">PO</option><option value="grn">GRN</option><option value="delivery_note">Delivery Note</option><option value="other">Other</option></select>
+                <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png,.docx,.xlsx" class="text-sm">
+                <button type="submit" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded-lg">Upload</button>
+            </form>
+            {% endif %}
+        </div>
+        <!-- Actions -->
+        {% if request.user.is_supplier and request.user.organisation == invoice.supplier and invoice.status == 'draft' %}
+        <form method="post" action="{% url 'invoices:submit' invoice.id %}">{% csrf_token %}<button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg">Submit for Approval</button></form>
+        {% endif %}
+        {% if invoice.status in 'offer_received,available_for_financing' and request.user.is_supplier and request.user.organisation == invoice.supplier %}
+        <a href="{% url 'invoices:supplier_offers' invoice.id %}" class="inline-block px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg">View Offers ({{ offers.count }})</a>
+        {% endif %}
+    </div>
+    <!-- Sidebar -->
+    <div class="space-y-6">
+        <!-- Status Timeline -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-gray-800 mb-4">Status History</h3>
+            <div class="space-y-3">
+            {% for h in status_history %}
+                <div class="flex gap-3">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                    <div><p class="text-xs font-medium">{{ h.get_new_status_display|default:h.new_status }}</p><p class="text-xs text-gray-400">{{ h.created_at|date:"M d, Y H:i" }}{% if h.changed_by %} · {{ h.changed_by.full_name }}{% endif %}</p>{% if h.comment %}<p class="text-xs text-gray-500 mt-0.5">{{ h.comment }}</p>{% endif %}</div>
+                </div>
+            {% empty %}
+            <p class="text-gray-400 text-xs">No status changes recorded.</p>
+            {% endfor %}
+            </div>
+        </div>
+        <!-- Offers summary -->
+        {% if offers %}
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-gray-800 mb-4">Offers</h3>
+            {% for offer in offers %}
+            <div class="py-2 border-b border-gray-100">
+                <p class="text-sm font-medium">{{ offer.financier.name }}</p>
+                <p class="text-xs text-gray-500">${{ offer.net_disbursement|intcomma }} net · {{ offer.discount_rate }}% · <span class="status-badge status-{{ offer.status }}">{{ offer.get_status_display }}</span></p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

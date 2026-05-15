@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Contact Us - CapitalZW{% endblock %}
+{% block body %}
+<div class="min-h-screen flex flex-col bg-gray-50">
+    <nav class="bg-white border-b border-gray-100 py-4"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"><a href="{% url 'public_site:home' %}" class="flex items-center gap-3"><div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center"><span class="text-white font-bold text-lg leading-none">C</span></div><span class="text-xl font-bold text-gray-900 tracking-tight">CapitalZW</span></a></div></nav>
+    <main class="flex-grow flex items-center justify-center p-4 py-12">
+        <div class="w-full max-w-xl bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Get in touch</h1>
+            <p class="text-gray-500 mb-8">Want to learn more about how CapitalZW can help your business? Fill out the form below and our team will get back to you shortly.</p>
+            {% if messages %}
+            {% for message in messages %}
+            <div class="mb-6 p-4 rounded-lg {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border border-emerald-200{% else %}bg-red-50 text-red-800 border border-red-200{% endif %}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            <form method="post" action="{% url 'public_site:contact' %}" class="space-y-5">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label><input type="text" name="full_name" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label><input type="email" name="email" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Organisation Name</label><input type="text" name="organisation_name" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label><input type="text" name="phone" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></div>
+                    <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">I am interested as a...</label><select name="organisation_type" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"><option value="supplier">Supplier (Want to finance my invoices)</option><option value="buyer">Buyer (Want to offer early payment to suppliers)</option><option value="financier">Financier (Want to fund approved invoices)</option><option value="other">Other / Partnership</option></select></div>
+                    <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-1">How can we help you? *</label><textarea name="message" rows="4" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></textarea></div>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors mt-6">Send Message</button>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

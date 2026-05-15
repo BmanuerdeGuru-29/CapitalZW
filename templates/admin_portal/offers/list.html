@@ -1,0 +1,34 @@
+{% extends "portal_base.html" %}{% load humanize %}
+{% block title %}Financing Offers - CapitalZW Admin{% endblock %}{% block page_title %}Financing Offers{% endblock %}
+{% block content %}
+<div class="mb-4 flex gap-3">
+    <form method="get" class="flex gap-2 flex-1">
+        <select name="status" class="px-3 py-2 border rounded-lg text-sm flex-1"><option value="">All Statuses</option><option value="submitted" {% if status_filter == 'submitted' %}selected{% endif %}>Submitted</option><option value="accepted" {% if status_filter == 'accepted' %}selected{% endif %}>Accepted</option><option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option><option value="withdrawn" {% if status_filter == 'withdrawn' %}selected{% endif %}>Withdrawn</option><option value="settled" {% if status_filter == 'settled' %}selected{% endif %}>Settled</option></select>
+        <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm">Filter</button>
+    </form>
+</div>
+<div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50"><tr><th class="px-5 py-3 text-left font-medium">Invoice</th><th class="px-5 py-3 text-left font-medium">Financier</th><th class="px-5 py-3 text-right font-medium">Offered</th><th class="px-5 py-3 text-right font-medium">Net Disb.</th><th class="px-5 py-3 text-left font-medium">Rate</th><th class="px-5 py-3 text-left font-medium">Status</th><th class="px-5 py-3"></th></tr></thead>
+        <tbody class="divide-y">
+        {% for offer in offers %}
+        <tr class="hover:bg-gray-50">
+            <td class="px-5 py-3"><a href="{% url 'invoices:detail' offer.invoice.id %}" class="font-medium text-emerald-600">{{ offer.invoice.invoice_reference }}</a></td>
+            <td class="px-5 py-3">{{ offer.financier.name }}</td>
+            <td class="px-5 py-3 text-right">${{ offer.offered_amount|intcomma }}</td>
+            <td class="px-5 py-3 text-right font-medium text-emerald-600">${{ offer.net_disbursement|intcomma }}</td>
+            <td class="px-5 py-3">{{ offer.discount_rate }}%</td>
+            <td class="px-5 py-3"><span class="status-badge status-{{ offer.status }}">{{ offer.get_status_display }}</span></td>
+            <td class="px-5 py-3">
+                {% if offer.status == 'accepted' %}
+                <a href="{% url 'invoices:admin_settle' offer.id %}" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg">Record Settlement</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="px-5 py-12 text-center text-gray-400">No offers found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

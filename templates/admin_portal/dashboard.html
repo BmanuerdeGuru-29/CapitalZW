@@ -1,0 +1,82 @@
+{% extends "portal_base.html" %}
+{% load humanize %}
+{% block title %}Admin Dashboard - CapitalZW{% endblock %}
+{% block page_title %}Platform Overview{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Users</p>
+        <p class="text-2xl font-bold text-gray-800 mt-1">{{ total_users }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Organisations</p>
+        <p class="text-2xl font-bold text-blue-600 mt-1">{{ total_orgs }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Invoice Value</p>
+        <p class="text-2xl font-bold text-emerald-600 mt-1">${{ total_invoice_value|intcomma }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Financed</p>
+        <p class="text-2xl font-bold text-teal-600 mt-1">${{ total_financed|intcomma }}</p>
+    </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="kpi-card bg-yellow-50 rounded-xl p-5 border border-yellow-200">
+        <p class="text-xs font-medium text-yellow-700 uppercase">Pending Organisations</p>
+        <p class="text-2xl font-bold text-yellow-800 mt-1">{{ pending_orgs }}</p>
+    </div>
+    <div class="kpi-card bg-blue-50 rounded-xl p-5 border border-blue-200">
+        <p class="text-xs font-medium text-blue-700 uppercase">Pending Approvals</p>
+        <p class="text-2xl font-bold text-blue-800 mt-1">{{ pending_approvals }}</p>
+    </div>
+    <div class="kpi-card bg-purple-50 rounded-xl p-5 border border-purple-200">
+        <p class="text-xs font-medium text-purple-700 uppercase">Pending KYC Reviews</p>
+        <p class="text-2xl font-bold text-purple-800 mt-1">{{ pending_kyc }}</p>
+    </div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Pending Registrations</h3>
+            <a href="{% url 'organisations:list' %}?status=pending" class="text-sm text-emerald-600">View all →</a>
+        </div>
+        <div class="p-5">
+            {% for org in recent_registrations %}
+            <a href="{% url 'organisations:detail' org.id %}" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
+                <div><p class="text-sm font-medium">{{ org.name }}</p><p class="text-xs text-gray-500">{{ org.get_organisation_type_display }} · {{ org.city }}</p></div>
+                <span class="status-badge status-pending">Pending</span>
+            </a>
+            {% empty %}
+            <p class="text-center text-gray-400 text-sm py-6">No pending registrations.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-5 py-4 border-b border-gray-100"><h3 class="font-semibold text-gray-800">High Value Invoices</h3></div>
+        <div class="p-5">
+            {% for inv in high_value_invoices %}
+            <a href="{% url 'invoices:detail' inv.id %}" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
+                <div><p class="text-sm font-medium">{{ inv.invoice_reference }}</p><p class="text-xs text-gray-500">${{ inv.invoice_amount|intcomma }}</p></div>
+                <span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span>
+            </a>
+            {% empty %}
+            <p class="text-center text-gray-400 text-sm py-6">No invoices yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-5 py-4 border-b border-gray-100"><h3 class="font-semibold text-gray-800">Recent Settlements</h3></div>
+        <div class="p-5">
+            {% for s in recent_settlements %}
+            <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
+                <div><p class="text-sm font-medium">{{ s.invoice.invoice_reference }}</p><p class="text-xs text-gray-500">${{ s.settlement_amount|intcomma }} · {{ s.settlement_date }}</p></div>
+                <span class="status-badge status-{{ s.status }}">{{ s.get_status_display }}</span>
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-400 text-sm py-6">No settlements recorded.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

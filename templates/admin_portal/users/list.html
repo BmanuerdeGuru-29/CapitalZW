@@ -1,0 +1,22 @@
+{% extends "portal_base.html" %}
+{% block title %}Users - CapitalZW{% endblock %}{% block page_title %}User Management{% endblock %}
+{% block content %}
+<div class="mb-4 flex gap-3">
+    <form method="get" class="flex gap-2 flex-1">
+        <input type="text" name="q" value="{{ search }}" placeholder="Search users..." class="px-4 py-2 border border-gray-300 rounded-lg text-sm flex-1 focus:ring-2 focus:ring-emerald-500">
+        <select name="role" class="px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="">All Roles</option>{% for val, label in request.user.ROLE_CHOICES %}<option value="{{ val }}" {% if role_filter == val %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+        <select name="status" class="px-3 py-2 border border-gray-300 rounded-lg text-sm"><option value="">All Status</option><option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option><option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option></select>
+        <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm">Filter</button>
+    </form>
+</div>
+<div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50"><tr><th class="px-5 py-3 text-left font-medium">Name</th><th class="px-5 py-3 text-left font-medium">Email</th><th class="px-5 py-3 text-left font-medium">Role</th><th class="px-5 py-3 text-left font-medium">Organisation</th><th class="px-5 py-3 text-left font-medium">Status</th><th class="px-5 py-3"></th></tr></thead>
+        <tbody class="divide-y">
+        {% for u in users %}
+        <tr class="hover:bg-gray-50"><td class="px-5 py-3 font-medium">{{ u.full_name }}</td><td class="px-5 py-3 text-gray-600">{{ u.email }}</td><td class="px-5 py-3">{{ u.get_role_display }}</td><td class="px-5 py-3 text-gray-600">{{ u.organisation.name|default:"-" }}</td><td class="px-5 py-3">{% if u.is_active %}<span class="status-badge status-approved">Active</span>{% else %}<span class="status-badge status-pending">Inactive</span>{% endif %}</td><td class="px-5 py-3"><a href="{% url 'accounts:user_detail' u.id %}" class="text-emerald-600 text-sm">View</a></td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

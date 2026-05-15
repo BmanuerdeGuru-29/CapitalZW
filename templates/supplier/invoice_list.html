@@ -1,0 +1,40 @@
+{% extends "portal_base.html" %}{% load humanize %}
+{% block title %}My Invoices - CapitalZW{% endblock %}{% block page_title %}My Invoices{% endblock %}
+{% block content %}
+<div class="mb-4 flex justify-between items-center">
+    <div class="flex gap-2">
+        <a href="?status=" class="px-3 py-1.5 text-sm rounded-lg {% if not status_filter %}bg-emerald-600 text-white{% else %}bg-gray-100 text-gray-600 hover:bg-gray-200{% endif %}">All</a>
+        <a href="?status=draft" class="px-3 py-1.5 text-sm rounded-lg {% if status_filter == 'draft' %}bg-emerald-600 text-white{% else %}bg-gray-100 text-gray-600{% endif %}">Draft</a>
+        <a href="?status=pending_buyer_approval" class="px-3 py-1.5 text-sm rounded-lg {% if status_filter == 'pending_buyer_approval' %}bg-emerald-600 text-white{% else %}bg-gray-100 text-gray-600{% endif %}">Pending</a>
+        <a href="?status=available_for_financing" class="px-3 py-1.5 text-sm rounded-lg {% if status_filter == 'available_for_financing' %}bg-emerald-600 text-white{% else %}bg-gray-100 text-gray-600{% endif %}">Approved</a>
+        <a href="?status=settled" class="px-3 py-1.5 text-sm rounded-lg {% if status_filter == 'settled' %}bg-emerald-600 text-white{% else %}bg-gray-100 text-gray-600{% endif %}">Settled</a>
+    </div>
+    <a href="{% url 'invoices:create' %}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg">+ New Invoice</a>
+</div>
+<div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-gray-600"><tr>
+            <th class="px-5 py-3 text-left font-medium">Reference</th>
+            <th class="px-5 py-3 text-left font-medium">Buyer</th>
+            <th class="px-5 py-3 text-right font-medium">Amount</th>
+            <th class="px-5 py-3 text-left font-medium">Due Date</th>
+            <th class="px-5 py-3 text-left font-medium">Status</th>
+            <th class="px-5 py-3 text-left font-medium"></th>
+        </tr></thead>
+        <tbody class="divide-y divide-gray-100">
+        {% for inv in invoices %}
+        <tr class="hover:bg-gray-50">
+            <td class="px-5 py-3 font-medium">{{ inv.invoice_reference }}</td>
+            <td class="px-5 py-3 text-gray-600">{{ inv.buyer.name }}</td>
+            <td class="px-5 py-3 text-right">{{ inv.currency }} {{ inv.invoice_amount|intcomma }}</td>
+            <td class="px-5 py-3 text-gray-600">{{ inv.due_date }}</td>
+            <td class="px-5 py-3"><span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span></td>
+            <td class="px-5 py-3"><a href="{% url 'invoices:detail' inv.id %}" class="text-emerald-600 hover:text-emerald-700 text-sm">View</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="px-5 py-12 text-center text-gray-400">No invoices submitted yet. Once you upload your first invoice, it will appear here.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

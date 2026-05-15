@@ -1,0 +1,54 @@
+{% extends "portal_base.html" %}
+{% load humanize %}
+{% block title %}Buyer Dashboard - CapitalZW{% endblock %}
+{% block page_title %}Buyer Dashboard{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pending Approvals</p>
+        <p class="text-2xl font-bold text-yellow-600 mt-1">{{ pending_approvals }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Approved Value</p>
+        <p class="text-2xl font-bold text-emerald-600 mt-1">${{ approved_value|intcomma }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Rejected</p>
+        <p class="text-2xl font-bold text-red-600 mt-1">{{ rejected }}</p>
+    </div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Pending Approval Queue</h3>
+            <a href="{% url 'invoices:buyer_pending' %}" class="text-sm text-emerald-600">View all →</a>
+        </div>
+        <div class="p-5">
+            {% for inv in pending_queue %}
+            <a href="{% url 'invoices:detail' inv.id %}" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div>
+                    <p class="text-sm font-medium">{{ inv.invoice_reference }}</p>
+                    <p class="text-xs text-gray-500">{{ inv.supplier.name }} · {{ inv.currency }} {{ inv.invoice_amount|intcomma }}</p>
+                </div>
+                <span class="status-badge status-pending_buyer_approval">Pending</span>
+            </a>
+            {% empty %}
+            <p class="text-center text-gray-400 text-sm py-8">You are all caught up. No invoices waiting for approval.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-5 py-4 border-b border-gray-100"><h3 class="font-semibold text-gray-800">Recently Approved</h3></div>
+        <div class="p-5">
+            {% for inv in recent_approved %}
+            <a href="{% url 'invoices:detail' inv.id %}" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
+                <div><p class="text-sm font-medium">{{ inv.invoice_reference }}</p><p class="text-xs text-gray-500">{{ inv.supplier.name }}</p></div>
+                <span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span>
+            </a>
+            {% empty %}
+            <p class="text-center text-gray-400 text-sm py-8">No approved invoices yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

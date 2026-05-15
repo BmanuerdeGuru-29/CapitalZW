@@ -1,0 +1,55 @@
+{% extends "portal_base.html" %}
+{% load humanize %}
+{% block title %}Financier Dashboard - CapitalZW{% endblock %}
+{% block page_title %}Financier Dashboard{% endblock %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Available Invoice Value</p>
+        <p class="text-2xl font-bold text-blue-600 mt-1">${{ available_value|intcomma }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Offers Submitted</p>
+        <p class="text-2xl font-bold text-yellow-600 mt-1">{{ submitted }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Offers Accepted</p>
+        <p class="text-2xl font-bold text-emerald-600 mt-1">{{ accepted }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Portfolio Exposure</p>
+        <p class="text-2xl font-bold text-teal-600 mt-1">${{ portfolio|intcomma }}</p>
+    </div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Marketplace Preview</h3>
+            <a href="{% url 'invoices:marketplace' %}" class="text-sm text-emerald-600">Browse all →</a>
+        </div>
+        <div class="p-5">
+            {% for inv in marketplace_invoices %}
+            <a href="{% url 'invoices:detail' inv.id %}" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
+                <div><p class="text-sm font-medium">{{ inv.invoice_reference }}</p><p class="text-xs text-gray-500">{{ inv.supplier.name }} → {{ inv.buyer.name }} · {{ inv.currency }} {{ inv.invoice_amount|intcomma }}</p></div>
+                <span class="text-xs text-gray-400">Due {{ inv.due_date }}</span>
+            </a>
+            {% empty %}
+            <p class="text-center text-gray-400 text-sm py-8">No approved invoices currently available for financing.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-5 py-4 border-b border-gray-100"><h3 class="font-semibold text-gray-800">My Recent Offers</h3></div>
+        <div class="p-5">
+            {% for offer in recent_offers %}
+            <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
+                <div><p class="text-sm font-medium">{{ offer.invoice.invoice_reference }}</p><p class="text-xs text-gray-500">${{ offer.offered_amount|intcomma }} · {{ offer.discount_rate }}%</p></div>
+                <span class="status-badge status-{{ offer.status }}">{{ offer.get_status_display }}</span>
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-400 text-sm py-8">No offers submitted yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

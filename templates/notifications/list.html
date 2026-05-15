@@ -1,0 +1,38 @@
+{% extends "portal_base.html" %}
+{% block title %}Notifications - CapitalZW{% endblock %}{% block page_title %}Notifications{% endblock %}
+{% block content %}
+<div class="max-w-3xl">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="font-medium text-gray-700">All Notifications</h3>
+        {% if unread_notification_count > 0 %}
+        <form method="post" action="{% url 'notifications:mark_all_read' %}">{% csrf_token %}<button type="submit" class="text-sm text-emerald-600 hover:text-emerald-700">Mark all as read</button></form>
+        {% endif %}
+    </div>
+    <div class="bg-white rounded-xl border shadow-sm divide-y">
+        {% for n in notifications %}
+        <div class="p-4 flex gap-4 {% if not n.is_read %}bg-emerald-50/30{% endif %} hover:bg-gray-50 transition-colors">
+            <div class="mt-1 flex-shrink-0">
+                {% if n.notification_type == 'approval' %}<div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                {% elif n.notification_type == 'invoice' %}<div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+                {% elif n.notification_type == 'offer' %}<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                {% elif n.notification_type == 'settlement' %}<div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+                {% else %}<div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                {% endif %}
+            </div>
+            <div class="flex-1">
+                <div class="flex justify-between items-start">
+                    <p class="text-sm font-semibold text-gray-800 {% if not n.is_read %}text-gray-900{% endif %}">{{ n.title }}</p>
+                    <span class="text-xs text-gray-400 whitespace-nowrap ml-2">{{ n.created_at|timesince }} ago</span>
+                </div>
+                <p class="text-sm text-gray-600 mt-0.5">{{ n.message }}</p>
+                {% if not n.is_read %}
+                <form method="post" action="{% url 'notifications:mark_read' n.id %}" class="mt-2">{% csrf_token %}<button type="submit" class="text-xs text-emerald-600 font-medium hover:text-emerald-700">Mark read</button></form>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="p-8 text-center text-gray-400">No notifications.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

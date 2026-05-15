@@ -1,0 +1,21 @@
+{% extends "portal_base.html" %}
+{% block title %}{{ user_obj.full_name }} - CapitalZW{% endblock %}{% block page_title %}User: {{ user_obj.full_name }}{% endblock %}
+{% block content %}
+<div class="max-w-3xl space-y-6">
+    <div class="bg-white rounded-xl border p-6">
+        <dl class="grid grid-cols-2 gap-4 text-sm">
+            <div><dt class="text-gray-500">Name</dt><dd class="font-medium">{{ user_obj.full_name }}</dd></div>
+            <div><dt class="text-gray-500">Email</dt><dd class="font-medium">{{ user_obj.email }}</dd></div>
+            <div><dt class="text-gray-500">Phone</dt><dd class="font-medium">{{ user_obj.phone|default:"-" }}</dd></div>
+            <div><dt class="text-gray-500">Role</dt><dd class="font-medium">{{ user_obj.get_role_display }}</dd></div>
+            <div><dt class="text-gray-500">Organisation</dt><dd class="font-medium">{{ user_obj.organisation.name|default:"-" }}</dd></div>
+            <div><dt class="text-gray-500">Status</dt><dd>{% if user_obj.is_active %}<span class="status-badge status-approved">Active</span>{% else %}<span class="status-badge status-pending">Inactive</span>{% endif %}</dd></div>
+            <div><dt class="text-gray-500">Joined</dt><dd class="font-medium">{{ user_obj.created_at|date:"M d, Y" }}</dd></div>
+        </dl>
+    </div>
+    <div class="flex gap-3">
+        <a href="{% url 'accounts:user_edit' user_obj.id %}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded-lg">Edit User</a>
+        <form method="post" action="{% url 'accounts:user_toggle_active' user_obj.id %}">{% csrf_token %}<button type="submit" class="px-4 py-2 {% if user_obj.is_active %}bg-red-600 hover:bg-red-700{% else %}bg-emerald-600 hover:bg-emerald-700{% endif %} text-white text-sm rounded-lg">{% if user_obj.is_active %}Suspend User{% else %}Activate User{% endif %}</button></form>
+    </div>
+</div>
+{% endblock %}

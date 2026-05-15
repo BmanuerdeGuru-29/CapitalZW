@@ -1,0 +1,89 @@
+{% extends "portal_base.html" %}
+{% load humanize %}
+{% block title %}Supplier Dashboard - CapitalZW{% endblock %}
+{% block page_title %}Supplier Dashboard{% endblock %}
+{% block content %}
+{% if no_org %}
+<div class="text-center py-16"><p class="text-gray-500">No organisation linked to your account.</p></div>
+{% else %}
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Invoices</p>
+        <p class="text-2xl font-bold text-gray-800 mt-1">{{ total_invoices }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Approved Value</p>
+        <p class="text-2xl font-bold text-emerald-600 mt-1">${{ approved_value|intcomma }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Offers Received</p>
+        <p class="text-2xl font-bold text-blue-600 mt-1">{{ offers_count }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Funded</p>
+        <p class="text-2xl font-bold text-teal-600 mt-1">${{ funded|intcomma }}</p>
+    </div>
+    <div class="kpi-card bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pending Settlements</p>
+        <p class="text-2xl font-bold text-yellow-600 mt-1">{{ pending_settlements }}</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Recent Invoices -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Recent Invoices</h3>
+            <a href="{% url 'invoices:supplier_list' %}" class="text-sm text-emerald-600 hover:text-emerald-700">View all →</a>
+        </div>
+        <div class="p-5">
+            {% if recent_invoices %}
+            <div class="space-y-3">
+                {% for inv in recent_invoices %}
+                <a href="{% url 'invoices:detail' inv.id %}" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">{{ inv.invoice_reference }}</p>
+                        <p class="text-xs text-gray-500">{{ inv.buyer.name }} · {{ inv.currency }} {{ inv.invoice_amount|intcomma }}</p>
+                    </div>
+                    <span class="status-badge status-{{ inv.status }}">{{ inv.get_status_display }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <p class="text-gray-400 text-sm">No invoices submitted yet.</p>
+                <a href="{% url 'invoices:create' %}" class="mt-2 inline-block text-sm text-emerald-600 hover:text-emerald-700 font-medium">Submit your first invoice →</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Offers Awaiting Action -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-5 py-4 border-b border-gray-100">
+            <h3 class="font-semibold text-gray-800">Offers Awaiting Action</h3>
+        </div>
+        <div class="p-5">
+            {% if pending_offers %}
+            <div class="space-y-3">
+                {% for offer in pending_offers %}
+                <a href="{% url 'invoices:supplier_offers' offer.invoice.id %}" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">{{ offer.invoice.invoice_reference }}</p>
+                        <p class="text-xs text-gray-500">{{ offer.financier.name }} · {{ offer.discount_rate }}% · Net: ${{ offer.net_disbursement|intcomma }}</p>
+                    </div>
+                    <span class="status-badge status-submitted">Review</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <p class="text-gray-400 text-sm">No offers have been submitted for your invoices yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

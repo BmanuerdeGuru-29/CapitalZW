@@ -1,0 +1,36 @@
+{% extends "portal_base.html" %}{% load humanize %}
+{% block title %}{{ invoice.invoice_reference }} - Review - CapitalZW{% endblock %}{% block page_title %}Review Invoice{{ invoice.invoice_reference }}{% endblock %}
+{% block content %}
+<div class="max-w-4xl space-y-6">
+    <div class="bg-white rounded-xl border p-6">
+        <div class="flex justify-between items-start mb-4"><h3 class="text-lg font-semibold">Invoice Details</h3><span class="status-badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></div>
+        <dl class="grid grid-cols-2 gap-4 text-sm">
+            <div><dt class="text-gray-500">Reference</dt><dd class="font-medium">{{ invoice.invoice_reference }}</dd></div>
+            <div><dt class="text-gray-500">Invoice Number</dt><dd class="font-medium">{{ invoice.invoice_number }}</dd></div>
+            <div><dt class="text-gray-500">Supplier</dt><dd class="font-medium">{{ invoice.supplier.name }}</dd></div>
+            <div><dt class="text-gray-500">Amount</dt><dd class="font-medium text-lg">{{ invoice.currency }} {{ invoice.invoice_amount|intcomma }}</dd></div>
+            <div><dt class="text-gray-500">Invoice Date</dt><dd class="font-medium">{{ invoice.invoice_date }}</dd></div>
+            <div><dt class="text-gray-500">Due Date</dt><dd class="font-medium">{{ invoice.due_date }}</dd></div>
+            {% if invoice.description %}<div class="col-span-2"><dt class="text-gray-500">Description</dt><dd>{{ invoice.description }}</dd></div>{% endif %}
+        </dl>
+    </div>
+    <div class="bg-white rounded-xl border p-6">
+        <h3 class="font-semibold mb-3">Documents</h3>
+        {% for doc in documents %}<div class="flex justify-between py-2 border-b border-gray-100"><span class="text-sm">{{ doc.file_name }} ({{ doc.get_document_type_display }})</span><a href="{% url 'invoices:doc_download' doc.id %}" class="text-sm text-emerald-600">Download</a></div>{% empty %}<p class="text-gray-400 text-sm">No documents.</p>{% endfor %}
+    </div>
+    {% if invoice.status == 'pending_buyer_approval' and request.user.is_buyer and request.user.organisation == invoice.buyer %}
+    <div class="bg-white rounded-xl border p-6">
+        <h3 class="font-semibold mb-4">Decision</h3>
+        <form method="post" action="{% url 'invoices:buyer_approve' invoice.id %}" class="space-y-4">
+            {% csrf_token %}
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Comments</label><textarea name="comments" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="Required for rejection or clarification request"></textarea></div>
+            <div class="flex gap-3">
+                <button type="submit" name="decision" value="approve" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg">Approve</button>
+                <button type="submit" name="decision" value="clarification" class="px-6 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-lg">Request Clarification</button>
+                <button type="submit" name="decision" value="reject" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg" onclick="return confirm('Are you sure you want to reject this invoice?');">Reject</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

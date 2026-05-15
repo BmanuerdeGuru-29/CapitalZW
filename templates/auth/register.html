@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Register - CapitalZW{% endblock %}
+{% block body %}
+<div class="min-h-screen gradient-bg flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl">
+        <div class="text-center mb-8">
+            <div class="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <span class="text-white font-bold text-2xl">C</span>
+            </div>
+            <h1 class="text-3xl font-bold text-white">Create Account</h1>
+            <p class="text-slate-300 mt-1">Join CapitalZW and unlock working capital from approved invoices</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            {% if form.errors %}
+            <div class="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm">Please correct the errors below.</div>
+            {% endif %}
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                <!-- Account Type -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b">Account Type</h3>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">I am a *</label>
+                        {{ form.account_type }}
+                        {% if form.account_type.errors %}<p class="text-red-500 text-xs mt-1">{{ form.account_type.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+                <!-- Personal Information -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b">Personal Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<p class="text-red-500 text-xs mt-1">{{ form.first_name.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<p class="text-red-500 text-xs mt-1">{{ form.last_name.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}<p class="text-red-500 text-xs mt-1">{{ form.phone.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}<p class="text-red-500 text-xs mt-1">{{ form.password.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
+                            {{ form.password_confirm }}
+                            {% if form.password_confirm.errors %}<p class="text-red-500 text-xs mt-1">{{ form.password_confirm.errors.0 }}</p>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Organisation -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b">Organisation Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Organisation Name *</label>
+                            {{ form.organisation_name }}
+                            {% if form.organisation_name.errors %}<p class="text-red-500 text-xs mt-1">{{ form.organisation_name.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Trading Name</label>
+                            {{ form.trading_name }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Registration Number *</label>
+                            {{ form.registration_number }}
+                            {% if form.registration_number.errors %}<p class="text-red-500 text-xs mt-1">{{ form.registration_number.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sector *</label>
+                            {{ form.sector }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                            {{ form.city }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+                            {{ form.country }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
+                            {{ form.contact_email }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Contact Phone</label>
+                            {{ form.contact_phone }}
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors">Create Account</button>
+            </form>
+            <div class="mt-6 text-center text-sm text-gray-500">
+                Already have an account? <a href="{% url 'accounts:login' %}" class="text-emerald-600 hover:text-emerald-700 font-medium">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
